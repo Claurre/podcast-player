@@ -1,5 +1,5 @@
 import React from 'react';
-import './ArtistCard.css';  
+/*import './ArtistCard.css';  */
 
 export default function SongCard({ nombre, imagen, artist, album }) {
   return (
