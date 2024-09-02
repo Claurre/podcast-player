@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
-import FormularioPlaylist from './FormularioPlaylist';
-import VistaPreviaPlaylist from './VistaPreviaPlaylist';
+import FormularioPlaylist from './FormularioPlaylist.tsx';
+import VistaPreviaPlaylist from './VistaPreviaPlaylist.tsx';
 import './AppTP2.css';
 
 
