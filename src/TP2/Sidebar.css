@@ -1,0 +1,37 @@
+.sidebar {
+    width: 250px;
+    background-color: #f0f0f0;
+    padding: 20px;
+  }
+  
+.sidebar h2 {
+    margin-bottom: 20px;
+  }
+  
+.crear-playlist-btn {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+.crear-playlist-btn:hover {
+    background-color: #0056b3;
+  }
+  
+.playlist-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+.playlist-imagen {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
