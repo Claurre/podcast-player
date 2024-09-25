@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './PodcastApp.css'; // Archivo CSS para los estilos
 
 interface Episode {
   id: number;
@@ -21,12 +22,11 @@ const PodcastApp: React.FC = () => {
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);  // Para manejar el estado de carga
-  const [error, setError] = useState<string | null>(null);  // Para manejar errores
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch de la API
-    fetch('https://api.audioboom.com/audio_clips')
+    fetch('https://api.allorigins.win/get?url=https://api.audioboom.com/audio_clips')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error en la respuesta de la API');
@@ -34,13 +34,12 @@ const PodcastApp: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        console.log('Datos de la API:', data);  // Log para inspeccionar
-        setEpisodes(data.body.audio_clips);
-        setLoading(false);  // Finaliza la carga
+        const parsedData = JSON.parse(data.contents); // Desempaquetar el contenido de la respuesta
+        setEpisodes(parsedData.body.audio_clips);
+        setLoading(false);
       })
       .catch((error) => {
-        console.error('Error al obtener los episodios:', error);
-        setError('Hubo un error al cargar los episodios.');  // Manejo de errores
+        setError('Hubo un error al cargar los episodios.');
         setLoading(false);
       });
   }, []);
@@ -65,43 +64,50 @@ const PodcastApp: React.FC = () => {
     }
   };
 
-  const truncateText = (text: string | undefined, maxLength: number) => {
-    if (!text) return ''; // Si el texto es undefined o null, devuelve una cadena vacía
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
-  
-  
-  
+
 
   if (loading) {
-    return <div>Cargando podcasts...</div>;  // Mostrar mientras carga
+    return <div>Cargando podcasts...</div>;
   }
 
   if (error) {
-    return <div>{error}</div>;  // Mostrar si hay error
+    return <div>{error}</div>;
   }
 
+  const truncateText = (text: string | undefined, maxLength: number) => {
+    if (!text) return 'No hay descripción disponible'; // Si el texto es undefined o vacío, muestra un mensaje por defecto
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+  
   return (
-    <div>
+    <div className="podcast-app">
       <h1>Podcasts</h1>
-      <div className="episodes-list">
+      <div className="podcasts-container">
         {episodes.map((episode) => (
-          <div key={episode.id} className="episode">
+          <div
+            key={episode.id}
+            className="podcast-card"
+            onClick={() => handlePlayPause(episode.urls.high_mp3)} // Hacer clic en toda la tarjeta
+          >
             <img
-              src={episode.channel?.urls?.logo_image?.original || 'fallback_image_url.jpg'} // Asegura que siempre haya una imagen o un fallback
+              src={episode.channel?.urls?.logo_image?.original || 'fallback_image_url.jpg'}
               alt={episode.title || 'Sin título'}
-              width="150"
+              className="podcast-image"
             />
-            <h2>{truncateText(episode.title, 50)}</h2>
-            <p>{truncateText(episode.description, 100)}</p>
-            <button onClick={() => handlePlayPause(episode.urls.high_mp3)}>
-              {playingUrl === episode.urls.high_mp3 && isPlaying ? 'Pausar' : 'Reproducir'}
-            </button>
+            <div className="podcast-details">
+              <h2>{truncateText(episode.title, 50)}</h2>
+              <p>{truncateText(episode.description, 100)}</p>
+              <div className="podcast-status">
+                {playingUrl === episode.urls.high_mp3 && isPlaying ? 'Reproduciendo...' : 'Haga clic para reproducir'}
+              </div>
+            </div>
           </div>
         ))}
       </div>
     </div>
   );
+  
 };
 
 export default PodcastApp;
+
