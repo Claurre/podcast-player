@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './PodcastApp.css'; // Archivo CSS para los estilos
+import './PodcastApp.css'; 
+import ReproductorBar from './ReproductorBar';
 
 interface Episode {
   id: number;
@@ -18,6 +19,7 @@ interface Episode {
 }
 
 const PodcastApp: React.FC = () => {
+  const [currentEpisode, setCurrentEpisode] = useState<number>(0);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -34,7 +36,7 @@ const PodcastApp: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        const parsedData = JSON.parse(data.contents); // Desempaquetar el contenido de la respuesta
+        const parsedData = JSON.parse(data.contents); 
         setEpisodes(parsedData.body.audio_clips);
         setLoading(false);
       })
@@ -43,6 +45,18 @@ const PodcastApp: React.FC = () => {
         setLoading(false);
       });
   }, []);
+
+  const handleNext = () => {
+    setCurrentEpisode((prev) => (prev + 1) % episodes.length);
+  };
+
+  const handlePrevious = () => {
+    setCurrentEpisode((prev) => (prev - 1 + episodes.length) % episodes.length);
+  };
+
+  const handleStop = () => {
+    console.log('Podcast detenido');
+  };
 
   const handlePlayPause = (url: string) => {
     if (playingUrl === url) {
@@ -75,19 +89,19 @@ const PodcastApp: React.FC = () => {
   }
 
   const truncateText = (text: string | undefined, maxLength: number) => {
-    if (!text) return 'No hay descripción disponible'; // Si el texto es undefined o vacío, muestra un mensaje por defecto
+    if (!text) return 'No hay descripción disponible'; 
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
   
   return (
     <div className="podcast-app">
-      <h1>Podcasts</h1>
+      <h1>Soy una sidebar</h1>
       <div className="podcasts-container">
         {episodes.map((episode) => (
           <div
             key={episode.id}
             className="podcast-card"
-            onClick={() => handlePlayPause(episode.urls.high_mp3)} // Hacer clic en toda la tarjeta
+            onClick={() => handlePlayPause(episode.urls.high_mp3)} 
           >
             <img
               src={episode.channel?.urls?.logo_image?.original || 'fallback_image_url.jpg'}
@@ -101,8 +115,16 @@ const PodcastApp: React.FC = () => {
                 {playingUrl === episode.urls.high_mp3 && isPlaying ? 'Reproduciendo...' : 'Haga clic para reproducir'}
               </div>
             </div>
+            <ReproductorBar
+        audioSrc={episodes[currentEpisode]?.urls.high_mp3}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onStop={handleStop}
+        />
           </div>
+          
         ))}
+        
       </div>
     </div>
   );
