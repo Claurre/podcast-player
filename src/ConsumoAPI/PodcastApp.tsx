@@ -3,23 +3,14 @@ import './PodcastApp.css';
 import ReproductorBar from './ReproductorBar';
 
 interface Episode {
-  id: number;
   title: string;
-  description: string;
-  urls: {
-    high_mp3: string;
-  };
-  channel: {
-    urls: {
-      logo_image: {
-        original: string;
-      };
-    };
-  };
+  urls: { high_mp3: string };
+  channel: { urls: { logo_image: { original: string } } };
 }
 
+
 const PodcastApp: React.FC = () => {
-  const [currentEpisode, setCurrentEpisode] = useState<number>(0);
+  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);;
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -46,17 +37,15 @@ const PodcastApp: React.FC = () => {
       });
   }, []);
 
-  const handleNext = () => {
-    setCurrentEpisode((prev) => (prev + 1) % episodes.length);
-  };
-
-  const handlePrevious = () => {
-    setCurrentEpisode((prev) => (prev - 1 + episodes.length) % episodes.length);
+  const handleCardClick = (episode: Episode) => {
+    setCurrentEpisode(episode); 
   };
 
   const handleStop = () => {
     console.log('Podcast detenido');
   };
+
+
 
   const handlePlayPause = (url: string) => {
     if (playingUrl === url) {
@@ -94,40 +83,30 @@ const PodcastApp: React.FC = () => {
   };
   
   return (
-    <div className="podcast-app">
-      <h1>Soy una sidebar</h1>
-      <div className="podcasts-container">
-        {episodes.map((episode) => (
+    <div>
+      <div className="podcast-grid">
+        {episodes.map((episode, index) => (
           <div
-            key={episode.id}
+            key={index}
             className="podcast-card"
-            onClick={() => handlePlayPause(episode.urls.high_mp3)} 
+            onClick={() => handleCardClick(episode)}
           >
-            <img
-              src={episode.channel?.urls?.logo_image?.original || 'fallback_image_url.jpg'}
-              alt={episode.title || 'Sin título'}
-              className="podcast-image"
-            />
-            <div className="podcast-details">
-              <h2>{truncateText(episode.title, 50)}</h2>
-              <p>{truncateText(episode.description, 100)}</p>
-              <div className="podcast-status">
-                {playingUrl === episode.urls.high_mp3 && isPlaying ? 'Reproduciendo...' : 'Haga clic para reproducir'}
-              </div>
-            </div>
-            <ReproductorBar
-        audioSrc={episodes[currentEpisode]?.urls.high_mp3}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
-        onStop={handleStop}
-        />
+            <img src={episode.channel.urls.logo_image.original} alt={episode.title} />
+            <h3>{episode.title}</h3>
           </div>
-          
         ))}
-        
       </div>
+      {currentEpisode && (
+        <ReproductorBar
+          audioSrc={currentEpisode.urls.high_mp3}
+          podcastImage={currentEpisode.channel.urls.logo_image.original}
+          podcastTitle={currentEpisode.title}
+          onStop={handleStop}
+        />
+      )}
     </div>
   );
+
   
 };
 
