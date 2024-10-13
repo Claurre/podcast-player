@@ -10,13 +10,19 @@ interface Episode {
 
 
 const PodcastApp: React.FC = () => {
-  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);;
+  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
+  
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPodcast, setSelectedPodcast] = useState<{
+    audioSrc: string;
+    podcastImage: string;
+    podcastTitle: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch('https://api.allorigins.win/get?url=https://api.audioboom.com/audio_clips')
@@ -43,6 +49,15 @@ const PodcastApp: React.FC = () => {
 
   const handleStop = () => {
     console.log('Podcast detenido');
+    setCurrentEpisode(null);
+  };
+
+  const handlePodcastClick = (audioSrc: string, podcastImage: string, podcastTitle: string) => {
+    setSelectedPodcast({
+      audioSrc,
+      podcastImage,
+      podcastTitle,
+    });
   };
 
 
@@ -66,7 +81,6 @@ const PodcastApp: React.FC = () => {
       setIsPlaying(true);
     }
   };
-
 
 
   if (loading) {

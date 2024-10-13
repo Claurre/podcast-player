@@ -9,12 +9,13 @@ interface ReproductorBarProps {
 }
 
 const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage, podcastTitle, onStop }) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
+  
 
   useEffect(() => {
     if (audioRef.current) {
@@ -58,8 +59,8 @@ const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage,
       audioRef.current.currentTime = 0;
       setIsPlaying(false);
       setCurrentTime(0);
-      onStop(); 
     }
+    onStop();
   };
 
   const handleProgressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +91,31 @@ const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage,
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  const handleStopAndHide = () => {
+    const audioElement = audioRef.current;
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
+    setIsPlaying(false);
+    onStop();
+  };
+
+  const handleForward = () => {
+    const audioElement = audioRef.current;
+    if (audioElement) {
+      audioElement.currentTime = Math.min(audioElement.currentTime + 3, audioElement.duration);
+    }
+  };
+
+  const handleRewind = () => {
+    const audioElement = audioRef.current;
+    if (audioElement) {
+      audioElement.currentTime = Math.max(audioElement.currentTime - 3, 0);
+    }
+  };
+
+
   return (
     <div className="reproductor-bar">
       <img src={podcastImage} alt={podcastTitle} className="podcast-image" />
@@ -105,11 +131,14 @@ const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage,
         <span className="timer">
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
+        <button className="stop-button" onClick={handleStopAndHide}>❌</button>
         <div className="bottom-controls">
           <span className="podcast-title">{podcastTitle}</span>
+          <button className="rewind-button" onClick={handleRewind}>⏪</button>
           <button onClick={togglePlayPause} className="play-pause-button">
             {isPlaying ? '⏸︎' : '►'}
           </button>
+          <button className="forward-button" onClick={handleForward}>⏩</button>
           <div className="volume-control">
           <span role="img" aria-label="volume">🔊</span>
           <input
