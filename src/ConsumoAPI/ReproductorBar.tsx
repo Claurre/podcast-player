@@ -53,15 +53,7 @@ const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage,
     }
   };
 
-  const handleStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setCurrentTime(0);
-    }
-    onStop();
-  };
+  
 
   const handleProgressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = Number(event.target.value);
@@ -129,7 +121,7 @@ const ReproductorBar: React.FC<ReproductorBarProps> = ({ audioSrc, podcastImage,
           className="progress-slider"
         />
         <span className="timer">
-          {formatTime(currentTime)} / {formatTime(duration)}
+          {formatTime(progress)} / {formatTime(duration)}
         </span>
         <button className="stop-button" onClick={handleStopAndHide}>❌</button>
         <div className="bottom-controls">

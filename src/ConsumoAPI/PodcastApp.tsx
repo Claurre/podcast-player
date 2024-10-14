@@ -11,18 +11,9 @@ interface Episode {
 
 const PodcastApp: React.FC = () => {
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  
   const [episodes, setEpisodes] = useState<Episode[]>([]);
-  const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPodcast, setSelectedPodcast] = useState<{
-    audioSrc: string;
-    podcastImage: string;
-    podcastTitle: string;
-  } | null>(null);
 
   useEffect(() => {
     fetch('https://api.allorigins.win/get?url=https://api.audioboom.com/audio_clips')
@@ -37,7 +28,7 @@ const PodcastApp: React.FC = () => {
         setEpisodes(parsedData.body.audio_clips);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch((_error) => {
         setError('Hubo un error al cargar los episodios.');
         setLoading(false);
       });
@@ -52,37 +43,6 @@ const PodcastApp: React.FC = () => {
     setCurrentEpisode(null);
   };
 
-  const handlePodcastClick = (audioSrc: string, podcastImage: string, podcastTitle: string) => {
-    setSelectedPodcast({
-      audioSrc,
-      podcastImage,
-      podcastTitle,
-    });
-  };
-
-
-
-  const handlePlayPause = (url: string) => {
-    if (playingUrl === url) {
-      if (isPlaying) {
-        audio?.pause();
-      } else {
-        audio?.play();
-      }
-      setIsPlaying(!isPlaying);
-    } else {
-      if (audio) {
-        audio.pause();
-      }
-      const newAudio = new Audio(url);
-      setAudio(newAudio);
-      newAudio.play();
-      setPlayingUrl(url);
-      setIsPlaying(true);
-    }
-  };
-
-
   if (loading) {
     return <div>Cargando podcasts...</div>;
   }
@@ -90,11 +50,6 @@ const PodcastApp: React.FC = () => {
   if (error) {
     return <div>{error}</div>;
   }
-
-  const truncateText = (text: string | undefined, maxLength: number) => {
-    if (!text) return 'No hay descripción disponible'; 
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
   
   return (
     <div>
